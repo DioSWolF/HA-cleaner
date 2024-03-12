@@ -135,14 +135,14 @@ class InstructionsExecute:
                     configuration.path + configuration.filename, configuration.type_cfg
                 )
 
-                if self.all_instructions.disable_automations.host_info is not None:
-                    host_info = self.all_instructions.disable_automations.host_info
+                self.all_configs.host_info.api_key = self.all_instructions.disable_automations.host_info.api_key
 
-                else:
-                    host_info = self.all_configs.host_info
+                if self.all_configs.host_info.host is not None:
+                    self.all_configs.host_info.host = self.all_instructions.disable_automations.host_info.host
+                    self.all_configs.host_info.port = self.all_instructions.disable_automations.host_info.port
 
                 automation_editor = AutomationsEditor(
-                    configuration, full_cfg, host_info
+                    configuration, full_cfg, self.all_configs.host_info
                 )
                 try:
                     automation_editor.disable_automation(ids_list)

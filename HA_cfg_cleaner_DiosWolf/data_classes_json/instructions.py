@@ -50,10 +50,9 @@ class FindInFiles:
 
 @dataclass
 class HostInst:
-    api_key: str | None
+    api_key: str
     host: str | None
     port: str | None
-    automations_off_url: str | None
 
 
 @dataclass
