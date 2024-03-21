@@ -61,6 +61,12 @@ class DisableAutomations(BaseListIds):
 
 
 @dataclass
+class ChangeAddonsOptions:
+    addon_id: str
+    addon_options: dict
+
+
+@dataclass
 class Instructions:
     delete_integrations: BaseListIds
     enable_integration: BaseListIds
@@ -75,3 +81,4 @@ class Instructions:
     disable_automations: DisableAutomations
     disable_addons: BaseListIds
     delete_addons: BaseListIds
+    change_addons_options: list[ChangeAddonsOptions]

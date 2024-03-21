@@ -43,14 +43,14 @@ class FileIO:
         with open(path, "w", encoding="utf8") as writer:
             self.json.dump(file, writer, indent=2, sort_keys=False, ensure_ascii=False)
 
-    def read_with_type(self, path: str, file_type: str = None) -> Union[T, dict]:
+    def read_with_type(self, path: str, file_type: str = None, data_class: Type[T] = None) -> Union[T, dict]:
         if file_type is None:
             file_type = self.parser.get_type(path)
 
         read_function: classmethod | None = self.read_functions.get(file_type)
 
         if read_function:
-            return read_function(path)
+            return read_function(path, data_class)
 
         raise ValueError(f"Unsupported file type: {file_type}")
 

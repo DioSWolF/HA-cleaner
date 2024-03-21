@@ -22,8 +22,8 @@ class ConsoleArguments:
                 args_dict["cfg_ha_path"] = arg
 
         if "inst_path" not in args_dict.keys():
-            # args_dict["inst_path"] = "instructions_empty.json"
-            raise Exception("Cant find instructions.json file")
+            # args_dict["inst_path"] = "instructions.json"
+            raise Exception("Cant find instructions file")
 
         if "cfg_ha_path" not in args_dict.keys():
             cfg_path = dirname(__file__).replace("instruction_classes", "")

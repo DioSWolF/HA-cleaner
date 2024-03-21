@@ -89,15 +89,17 @@
         "off_integration": "user"},
 
     "host_info": {
-        "api_key": "Bearer",
-        "host": "https://localhost",
+        "api_key": "Bearer ",
+        "host": "http://localhost",
         "port": "8123",
-        "automations_off_url": "/api/services/homeassistant/turn_off"
+        "automations_off_url": "/api/services/homeassistant/turn_off",
+        "addons_options_url": "http://172.30.32.2/addons/{addon_id}/options"
     },
 
     "ssh_commands": {
         "delete_addons": ["ha", "addon", "uninstall"],
         "disable_addons": ["ha", "addon", "stop"],
-        "change_cfg_addons": ["ha", "addons", "update", "--config"]
+        "change_cfg_addons": ["ha", "addons", "update", "--config"],
+        "get_supervisor_api": ["docker", "inspect", "homeassistant"]
     }
 }

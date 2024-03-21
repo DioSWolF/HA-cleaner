@@ -1,7 +1,8 @@
 import logging
 
+from HA_cfg_cleaner_DiosWolf.castom_errors.castom_errors import AddonError
 from HA_cfg_cleaner_DiosWolf.data_classes_json.file_config import ConfigurationFile
-from HA_cfg_cleaner_DiosWolf.data_classes_json.instructions import Instructions
+from HA_cfg_cleaner_DiosWolf.data_classes_json.instructions import Instructions, ChangeAddonsOptions
 from HA_cfg_cleaner_DiosWolf.files_editors.addons_editor import AddonsEditor
 from HA_cfg_cleaner_DiosWolf.files_editors.automations_editor import AutomationsEditor
 from HA_cfg_cleaner_DiosWolf.files_editors.editor_restore_state import EditorRestoreFile
@@ -15,7 +16,7 @@ from HA_cfg_cleaner_DiosWolf.files_editors.script_editor_cls import ScriptsEdito
 
 logging.basicConfig(
     level=logging.DEBUG,
-    filename="script_logs.log",
+    filename="./config/script_logs.log",
     filemode="w",
     format="\n%(asctime)s %(levelname)s %(message)s",
     encoding="utf-8")
@@ -48,6 +49,7 @@ class InstructionsExecute:
                     configuration.type_cfg,
                 )
             except Exception as e:
+                print("Error, check log file")
                 logging.error("Exception", exc_info=True)
 
     def enable_integrations(self):
@@ -104,6 +106,7 @@ class InstructionsExecute:
                     configuration.type_cfg,
                 )
             except Exception as e:
+                print("Error, check log file")
                 logging.error("Exception", exc_info=True)
 
     def del_automations_restore_state(self):
@@ -137,7 +140,8 @@ class InstructionsExecute:
 
                 self.all_configs.host_info.api_key = self.all_instructions.disable_automations.host_info.api_key
 
-                if self.all_configs.host_info.host is not None:
+                if self.all_instructions.disable_automations.host_info.host is not None:
+
                     self.all_configs.host_info.host = self.all_instructions.disable_automations.host_info.host
                     self.all_configs.host_info.port = self.all_instructions.disable_automations.host_info.port
 
@@ -147,6 +151,7 @@ class InstructionsExecute:
                 try:
                     automation_editor.disable_automation(ids_list)
                 except Exception as e:
+                    print("Error, check log file")
                     logging.error("Exception", exc_info=True)
 
     def del_addons(self):
@@ -157,19 +162,37 @@ class InstructionsExecute:
                 addon_editor.use_ssh_addon(
                     addon_id, self.all_configs.ssh_commands.delete_addons
                 )
-            except Exception as e:
-                logging.error("Exception", exc_info=True)
+            except AddonError as e:
+                print("Error, check log file")
+                logging.error(f"Exception {e.error_text}")
 
     def disable_addons(self):
         ids_list: list[str] = self.all_instructions.disable_addons.ids_list
         for addon_id in ids_list:
             try:
+                addon_editor = AddonsEditor(self.all_configs.ssh_commands, self.all_configs.host_info)
+                addon_editor.stop_autoboot(addon_id)
+
                 addon_editor = AddonsEditor(self.all_configs.ssh_commands)
                 addon_editor.use_ssh_addon(
                     addon_id, self.all_configs.ssh_commands.disable_addons
                 )
+
             except Exception as e:
-                logging.error("Exception")
+                print("Error, check log file")
+                logging.error("Exception", exc_info=True)
+
+    def change_addons_options(self):
+        addons_dict: list[ChangeAddonsOptions] = self.all_instructions.change_addons_options
+        for addon_dict in addons_dict:
+
+            try:
+                addon_editor = AddonsEditor(self.all_configs.ssh_commands, self.all_configs.host_info)
+                addon_editor.change_addon_options(addon_dict.addon_id, addon_dict.addon_options)
+
+            except Exception as e:
+                print("Error, check log file")
+                logging.error("Exception", exc_info=True)
 
     def del_script(self):
         for instruction in self.all_instructions.delete_script:
@@ -204,6 +227,7 @@ class InstructionsExecute:
                 restore_script.del_script_restore_state(instruction.scripts_ids)
 
             except Exception as e:
+                print("Error, check log file")
                 logging.error("Exception", exc_info=True)
 
         self.file_io.write_with_type(
@@ -220,6 +244,7 @@ class InstructionsExecute:
                 try:
                     fl_fld_editor.delete_objects(path)
                 except Exception as e:
+                    print("Error, check log file")
                     logging.error("Exception", exc_info=True)
 
     def clean_folders(self):
@@ -230,6 +255,7 @@ class InstructionsExecute:
                 try:
                     fl_fld_editor.clean_folders(path)
                 except Exception as e:
+                    print("Error, check log file")
                     logging.error("Exception", exc_info=True)
 
     def clean_files(self):
@@ -240,6 +266,7 @@ class InstructionsExecute:
                 try:
                     fl_fld_editor.clean_files(path)
                 except Exception as e:
+                    print("Error, check log file")
                     logging.error("Exception", exc_info=True)
 
     def change_files(self):
@@ -251,17 +278,21 @@ class InstructionsExecute:
                     file_editor.change_file(new_part)
                 self.file_io.write_with_type(file_info.path, file_editor.original_file)
             except Exception as e:
+                print("Error, check log file")
                 logging.error("Exception", exc_info=True)
 
     def searching_in_files(self):
-        searcher = FindInAllFiles()
-        find_dict = searcher.start_find(
-            self.all_instructions.find_in_all_files.text_to_find
-        )
         if self.all_instructions.find_in_all_files.report_path:
+
+            searcher = FindInAllFiles()
+            find_dict = searcher.start_find(
+                self.all_instructions.find_in_all_files.text_to_find
+            )
+
             try:
                 self.file_io.json_write(
                     self.all_instructions.find_in_all_files.report_path, find_dict
                 )
             except FileNotFoundError:
+                print("Error, check log file")
                 logging.error(f"Can't find path {self.all_instructions.find_in_all_files.report_path} for create result file")

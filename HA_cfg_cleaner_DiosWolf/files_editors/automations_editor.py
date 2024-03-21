@@ -9,13 +9,14 @@ from HA_cfg_cleaner_DiosWolf.ha_requests.ha_request import HARequests
 
 class AutomationsEditor:
     def __init__(
-        self, configuration: Configuration, full_cfg: dict, host_cfg: HostInfo = None
+            self, configuration: Configuration, full_cfg: dict, host_cfg: HostInfo = None
     ):
         self.configuration = configuration
         self.full_cfg = full_cfg
 
         if host_cfg:
-            self.ha_request = HARequests(host_cfg)
+            self.host_cfg = host_cfg
+            self.ha_request = HARequests(host_cfg, host_cfg.api_key)
 
     def __get_editable_cfg(self) -> dict:
         if self.configuration.first_key is None:
@@ -69,7 +70,11 @@ class AutomationsEditor:
 
     def disable_automation(self, automations_ids: list[str]) -> Response:
         automations_entities_ids = self.__get_entities_ids(automations_ids)
-
+        url = (self.host_cfg.host
+               + ":"
+               + self.host_cfg.port
+               + self.host_cfg.automations_off_url
+               )
         if automations_entities_ids:
             data = {self.configuration.on_off_field: automations_entities_ids}
-            return self.ha_request.post_requests(data)
+            return self.ha_request.post_requests(url, data)

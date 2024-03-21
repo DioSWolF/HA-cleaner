@@ -40,6 +40,7 @@ class HostInfo:
     host: str
     port: str
     automations_off_url: str
+    addons_options_url: str
 
 
 @dataclass
@@ -47,7 +48,7 @@ class SshCommands:
     delete_addons: list[str]
     disable_addons: list[str]
     change_cfg_addons: list[str]
-
+    get_supervisor_api: list[str]
 
 @dataclass
 class ConfigurationFile:
